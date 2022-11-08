@@ -7,12 +7,14 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using NGUYENVANKHOATBTH2.Data;
 using NGUYENVANKHOATBTH2.Models;
+using NGUYENVANKHOATBTH2.Models.Process;
 
 namespace NGUYENVANKHOATBTH2.Controllers
 {
     public class EmployeeController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private ExcelProcess _excelProcess=new ExcelProcess();
 
         public EmployeeController(ApplicationDbContext context)
         {
@@ -154,6 +156,50 @@ namespace NGUYENVANKHOATBTH2.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+
+
+        public async Task<IActionResult> Upload(){
+            return View();
+        }
+          [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult>Upload(IFormFile file){
+              if (file!=null)
+            {
+                string fileExtension = Path.GetExtension(file.FileName);
+                if (fileExtension != ".xls" && fileExtension != ".xlsx")
+                {
+                    ModelState.AddModelError("","Please choose excel file to upload!");
+                }
+                else 
+                {
+                    //rename file when upload to server
+                    var fileName = DateTime.Now.ToShortTimeString() + fileExtension;
+                    var filePath = Path.Combine(Directory.GetCurrentDirectory() + "/Uploads/Excels", fileName);
+                    var fileLocation = new FileInfo(filePath).ToString();
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        //save file to server
+                        await file.CopyToAsync(stream);
+                         var dt = _excelProcess.ExcelToDataTable(fileLocation);
+                        for (int i=0; i < dt.Rows.Count; i++)
+                        {
+                            var emp = new Employee();
+
+                            emp.EmployeeId=dt.Rows[i][0].ToString();
+                            emp.EmployeeName=dt.Rows[i][1].ToString();
+                            emp.Address=dt.Rows[i][3].ToString();
+                            //
+                            _context.Employee.Add(emp);
+                        }
+                        await _context.SaveChangesAsync();
+                        return RedirectToAction(nameof(Index));
+                    }
+                }
+            }
+            return View();
+        }
+
 
         private bool EmployeeExists(string id)
         {

@@ -32,14 +32,14 @@ namespace NGUYENVANKHOATBTH2.Controllers
         {
             if (id == null || _context.Students == null)
             {
-                return NotFound();
+                return View("NotFound");
             }
 
             var student = await _context.Students
                 .FirstOrDefaultAsync(m => m.StudentID == id);
             if (student == null)
             {
-                return NotFound();
+                return View("NotFound");
             }
 
             return View(student);
@@ -72,13 +72,13 @@ namespace NGUYENVANKHOATBTH2.Controllers
         {
             if (id == null || _context.Students == null)
             {
-                return NotFound();
+                return View("NotFound");
             }
 
             var student = await _context.Students.FindAsync(id);
             if (student == null)
             {
-                return NotFound();
+                return View("NotFound");
             }
             return View(student);
         }
@@ -92,7 +92,7 @@ namespace NGUYENVANKHOATBTH2.Controllers
         {
             if (id != student.StudentID)
             {
-                return NotFound();
+                return View("NotFound");
             }
 
             if (ModelState.IsValid)
@@ -106,7 +106,7 @@ namespace NGUYENVANKHOATBTH2.Controllers
                 {
                     if (!StudentExists(student.StudentID))
                     {
-                        return NotFound();
+                        return View("NotFound");
                     }
                     else
                     {
@@ -123,14 +123,14 @@ namespace NGUYENVANKHOATBTH2.Controllers
         {
             if (id == null || _context.Students == null)
             {
-                return NotFound();
+                return View("NotFound");
             }
 
             var student = await _context.Students
                 .FirstOrDefaultAsync(m => m.StudentID == id);
             if (student == null)
             {
-                return NotFound();
+                return View("NotFound");
             }
 
             return View(student);
@@ -159,5 +159,6 @@ namespace NGUYENVANKHOATBTH2.Controllers
         {
           return (_context.Students?.Any(e => e.StudentID == id)).GetValueOrDefault();
         }
+       
     }
 }
