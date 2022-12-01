@@ -12,6 +12,7 @@ namespace NGUYENVANKHOATBTH2.Data
         public DbSet<NGUYENVANKHOATBTH2.Models.Employee>? Employee { get; set; }
         public DbSet<NGUYENVANKHOATBTH2.Models.Person>? Person { get; set; }
         public DbSet<NGUYENVANKHOATBTH2.Models.Customer>? Customer { get; set; }
+         public DbSet<NGUYENVANKHOATBTH2.Models.Faculty>? Faculty { get; set; }
     }
 
 }

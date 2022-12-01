@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,12 +8,14 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using NGUYENVANKHOATBTH2.Data;
 using NGUYENVANKHOATBTH2.Models;
+using NGUYENVANKHOATBTH2.Models.Process;
 
 namespace NGUYENVANKHOATBTH2.Controllers
 {
     public class StudentController : Controller
     {
         private readonly ApplicationDbContext _context;
+        StringProcess strPro= new StringProcess();
 
         public StudentController(ApplicationDbContext context)
         {
@@ -48,6 +51,15 @@ namespace NGUYENVANKHOATBTH2.Controllers
         // GET: Student/Create
         public IActionResult Create()
         {
+            var newStudentID = "STD001";
+            var countStudent = _context.Students.Count();
+            if( countStudent>0){
+                var StudentID = _context.Students.OrderByDescending(m =>m.StudentID).First().StudentID;
+                newStudentID = strPro.AutoGenerateCode(StudentID);
+            }
+            ViewBag.newId = newStudentID;
+            
+            ViewData["FacultyID"]=new SelectList(_context.Faculty,"FacultyID","FacultyName");
             return View();
         }
 
@@ -56,7 +68,7 @@ namespace NGUYENVANKHOATBTH2.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("StudentID,StudentName")] Student student)
+        public async Task<IActionResult> Create([Bind("StudentID,StudentName,FacultyID")] Student student)
         {
             if (ModelState.IsValid)
             {
@@ -64,6 +76,8 @@ namespace NGUYENVANKHOATBTH2.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+            ViewData["FacultyID"]=new SelectList(_context.Faculty,"FacultyID","FacultyName",student.FacultyID);
+
             return View(student);
         }
 
